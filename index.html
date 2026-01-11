@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>UOL CS Exam Scheduler | Enterprise Portal</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Instruction Modal -->
+<div id="instructionModal" class="instruction-modal">
+    <div class="instruction-content">
+        <div class="instruction-header">
+            <h3><i class="fas fa-info-circle"></i> Welcome to UOL CS Exam Schedule</h3>
+            <button class="instruction-close" onclick="closeInstruction()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="instruction-body">
+            <h4>How to Use This System:</h4>
+            
+            <div class="instruction-step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h5>Upload Your Excel File</h5>
+                    <p>Click the upload area in the sidebar or drag & drop your Excel file (.xlsx, .xls, .csv). The system will automatically filter CS department data.</p>
+                </div>
+            </div>
+            
+            <div class="instruction-step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h5>Filter by Program/Semester</h5>
+                    <p>Use the program filters in the sidebar to view specific programs (BSCS, BSSE, etc.), semesters, or sections. Click "Clear All" to reset filters.</p>
+                </div>
+            </div>
+            
+            <div class="instruction-step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h5>View and Search Data</h5>
+                    <p>View the schedule in table format. Use the search box to find specific entries. Click any row to see detailed exam information.</p>
+                </div>
+            </div>
+            
+            <div class="instruction-step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h5>Export Data</h5>
+                    <p>Use the action buttons to export data as Excel or PDF files, print the schedule, or refresh the data.</p>
+                </div>
+            </div>
+            
+            <div class="instruction-step">
+                <div class="step-number">5</div>
+                <div class="step-content">
+                    <h5>Theme & Display</h5>
+                    <p>Toggle between light and dark themes using the theme button in the top navigation bar.</p>
+                </div>
+            </div>
+            
+            <div class="important-note">
+                <h5><i class="fas fa-exclamation-triangle"></i> Important Notes:</h5>
+                <ul>
+                    <li>Only Excel files with CS department data will be processed</li>
+                    <li>Date columns should be properly formatted in Excel</li>
+                    <li>Program names should include CS codes (e.g., BSCS-6, BSSE-5A)</li>
+                    <li>Supported formats: .xlsx, .xls, .csv</li>
+                </ul>
+            </div>
+            
+            <div class="instruction-footer">
+                <button class="primary-btn" onclick="closeInstruction()">
+                    <i class="fas fa-play-circle"></i> Get Started
+                </button>
+                <label class="dont-show-again">
+                    <input type="checkbox" id="dontShowAgain">
+                    <span>Don't show this again</span>
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+  <!-- Top Navigation Bar -->
+  <nav class="top-nav">
+    <div class="container nav-container">
+      <div class="nav-left">
+        <div class="logo-container">
+          <div class="logo-ico">
+            <img src="D:\University Web Work\Final term syllabus\UOL Exam Management System\img\Minar Pakistan.jpeg" style="width: 50px; height: 50px; border-radius: 50%;" alt="UOL Logo">
+          </div>
+          <div class="logo-text">
+            <h1>UOL<span class="logo-highlight">CS</span></h1>
+            <p class="logo-subtitle">Examination Management System</p>
+          </div>
+        </div>
+        
+        <div class="nav-divider"></div>
+        
+        <div class="system-info">
+          <div class="info-item">
+            <i class="fas fa-calendar-day"></i>
+            <div>
+              <span class="info-label">Academic Year</span>
+              <span class="info-value">2025-2026</span>
+            </div>
+          </div>
+          <div class="info-item">
+            <i class="fas fa-clock"></i>
+            <div>
+              <span class="info-label">Term</span>
+              <span class="info-value">Fall Semester</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="nav-right">
+        <div class="user-controls">
+          <button class="nav-btn" onclick="toggleTheme()" title="Toggle Theme">
+            <i class="fas fa-palette"></i>
+          </button>
+          <!-- <button class="nav-btn" onclick="toggleLang()" title="Switch Language">
+            <i class="fas fa-language"></i>
+            <span id="langText">اردو</span>
+          </button> -->
+          <div class="user-profile">
+            <div class="avatar">
+              <i class="fas fa-user-tie"></i>
+            </div>
+            <div class="user-details">
+              <span class="user-name">Exam Coordinator</span>
+              <span class="user-role">Department of CS</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Dashboard -->
+  <div class="container main-dashboard">
+    <!-- Left Sidebar - Program Selection -->
+    <aside class="program-sidebar">
+      <div class="sidebar-header">
+        <h3><i class="fas fa-sitemap"></i> Programs & Semesters</h3>
+        <!-- <button class="sidebar-toggle" onclick="toggleSidebar()">
+          <i class="fas fa-chevron-left"></i>
+        </button> -->
+      </div>
+      
+      <div class="sidebar-content">
+        <!-- File Upload Section -->
+        <div class="upload-card">
+          <div class="upload-icon">
+            <i class="fas fa-cloud-upload-alt"></i>
+          </div>
+          <h4>Import Schedule</h4>
+          <p class="upload-desc">Upload Excel file with exam schedule</p>
+          <label for="upload" class="upload-area">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span>Browse or Drop File</span>
+            <input type="file" id="upload" accept=".xlsx,.xls,.csv">
+          </label>
+          <p class="file-types">Supports: .xlsx, .xls, .csv</p>
+        </div>
+
+        <!-- Program Filters -->
+        <div class="program-filters">
+          <div class="filter-header">
+            <h4><i class="fas fa-filter"></i> Quick Filters</h4>
+            <button class="filter-clear" onclick="clearAllFilters()">Clear All</button>
+          </div>
+          
+          <div class="filter-search">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchFilter" placeholder="Search semester/section..." onkeyup="filterSemesters()">
+          </div>
+          
+          <div class="program-list" id="programList">
+            <!-- Program groups will be generated here -->
+          </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="statistics-card">
+          <h4><i class="fas fa-chart-line"></i> Statistics</h4>
+          <div class="stats-grid">
+            <div class="stat-box">
+              <div class="stat-icon total-exams">
+                <i class="fas fa-clipboard-list"></i>
+              </div>
+              <div class="stat-details">
+                <span class="stat-count" id="totalExams">0</span>
+                <span class="stat-label">Total Exams</span>
+              </div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-icon total-students">
+                <i class="fas fa-users"></i>
+              </div>
+              <div class="stat-details">
+                <span class="stat-count" id="totalStudents">0</span>
+                <span class="stat-label">Students</span>
+              </div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-icon total-rooms">
+                <i class="fas fa-door-open"></i>
+              </div>
+              <div class="stat-details">
+                <span class="stat-count" id="totalRooms">0</span>
+                <span class="stat-label">Rooms Used</span>
+              </div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-icon active-faculty">
+                <i class="fas fa-chalkboard-teacher"></i>
+              </div>
+              <div class="stat-details">
+                <span class="stat-count" id="activeFaculty">0</span>
+                <span class="stat-label">Faculty Involved</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="content-area">
+      <!-- Content Header -->
+      <header class="content-header">
+        <div class="header-left">
+          <div class="breadcrumb">
+            <span class="breadcrumb-item">Dashboard</span>
+            <i class="fas fa-chevron-right"></i>
+            <span class="breadcrumb-item">Exam Schedule</span>
+            <i class="fas fa-chevron-right"></i>
+            <span class="breadcrumb-item active" id="currentProgram">All Programs</span>
+          </div>
+          <h2 id="pageTitle">Final Term Examination Schedule</h2>
+          <p class="page-subtitle" id="pageSubtitle">Computer Science Department | Fall 2025-2026</p>
+        </div>
+        
+        <div class="header-actions">
+          <div class="action-group">
+            <!-- <button class="action-btn print" onclick="window.print()">
+              <i class="fas fa-print"></i>
+              <span>Print</span>
+            </button> -->
+            <button class="action-btn export" onclick="downloadExcel()">
+              <i class="fas fa-file-excel"></i>
+              <span>Export Excel</span>
+            </button>
+            <button class="action-btn pdf" onclick="downloadPDF()">
+              <i class="fas fa-file-pdf"></i>
+              <span>Export PDF</span>
+            </button>
+            <button class="action-btn refresh" onclick="refreshData()">
+              <i class="fas fa-sync-alt"></i>
+              <span>Refresh</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Selected Program Info -->
+      <div class="selected-program-info" id="selectedProgramInfo">
+        <div class="program-card">
+          <div class="program-icon">
+            <i class="fas fa-university"></i>
+          </div>
+          <div class="program-details">
+            <h3 id="selectedProgramName">All Computer Science Programs</h3>
+            <div class="program-meta">
+              <span class="meta-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Schedule Loaded: <span id="scheduleDate">-</span></span>
+              </span>
+              <span class="meta-item">
+                <i class="fas fa-database"></i>
+                <span>Data Version: <span id="dataVersion">1.0</span></span>
+              </span>
+            </div>
+          </div>
+          <div class="program-stats">
+            <div class="mini-stat">
+              <span class="mini-stat-value" id="programExams">0</span>
+              <span class="mini-stat-label">Exams</span>
+            </div>
+            <div class="mini-stat">
+              <span class="mini-stat-value" id="programStudents">0</span>
+              <span class="mini-stat-label">Students</span>
+            </div>
+            <div class="mini-stat">
+              <span class="mini-stat-value" id="programRooms">0</span>
+              <span class="mini-stat-label">Rooms</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data Table Section -->
+      <div class="table-section">
+        <div class="table-header">
+          <h3><i class="fas fa-table"></i> Examination Schedule</h3>
+          <div class="table-controls">
+            <div class="view-toggle">
+              <button class="view-btn active" data-view="table">
+                <i class="fas fa-table"></i> Table
+              </button>
+              <button class="view-btn" data-view="calendar">
+                <i class="fas fa-calendar"></i> Calendar
+              </button>
+            </div>
+            <div class="table-search">
+              <i class="fas fa-search"></i>
+              <input type="text" id="tableSearch" placeholder="Search in table..." onkeyup="filterTable()">
+            </div>
+          </div>
+        </div>
+        
+        <div class="table-container">
+          <!-- Loading State -->
+          <div class="loading-state" id="loadingState">
+            <div class="loading-spinner">
+              <div class="spinner"></div>
+            </div>
+            <p>Loading schedule data...</p>
+          </div>
+          
+          <!-- Empty State -->
+          <div class="empty-state" id="emptyState">
+            <div class="empty-illustration">
+              <i class="fas fa-file-spreadsheet"></i>
+            </div>
+            <h3>No Schedule Data</h3>
+            <p>Upload an Excel file or select a program to view the examination schedule</p>
+            <label for="upload" class="primary-btn">
+              <i class="fas fa-cloud-upload-alt"></i> Upload Schedule File
+            </label>
+          </div>
+          
+          <!-- Table View -->
+          <div class="table-view" id="tableView">
+            <div class="table-scroll">
+              <table id="scheduleTable">
+                <thead>
+                  <tr id="tableHeader">
+                    <!-- Table headers will be inserted here -->
+                  </tr>
+                </thead>
+                <tbody id="tableBody">
+                  <!-- Table rows will be inserted here -->
+                </tbody>
+              </table>
+            </div>
+            
+            <!-- Table Footer -->
+            <div class="table-footer">
+              <div class="table-info">
+                <span>Showing <span id="visibleRows">0</span> of <span id="totalRows">0</span> exams</span>
+              </div>
+              <div class="table-pagination">
+                <button class="pagination-btn" onclick="changePage(-1)">
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+                <span class="page-info">Page <span id="currentPage">1</span> of <span id="totalPages">1</span></span>
+                <button class="pagination-btn" onclick="changePage(1)">
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Calendar View (Hidden by default) -->
+          <div class="calendar-view" id="calendarView" style="display: none;">
+            <div class="calendar-container" id="calendarContainer">
+              <!-- Calendar will be generated here -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <footer class="content-footer">
+        <div class="footer-left">
+          <div class="status-indicator">
+            <div class="status-dot online"></div>
+            <span>System Status: <strong>Operational</strong></span>
+          </div>
+          <p class="footer-copyright">© 2026 University of Lahore - Computer Science Department</p>
+        </div>
+        <div class="footer-right">
+          <div class="contact-info">
+            <span><i class="fas fa-envelope"></i> admissions@uol.edu.pk</span>
+            <span><i class="fas fa-phone"></i> +92 42 111 865 865</span>
+          </div>
+          <div class="system-info">
+            <span><i class="fas fa-user-tie"></i> HOD: Dr. Waseem Abbasi</span>
+            <span><i class="fas fa-user-cog"></i> Coordinator: Muhammad Usman</span>
+          </div>
+          <!-- Developer Portfolio Button moved to right side -->
+          <div class="portfolio-section">
+            <button class="portfolio-btn" onclick="showPortfolioInfo()">
+              <i class="fas fa-user-circle"></i> Developer Portfolio
+            </button>
+            <div class="portfolio-info" id="portfolioInfo" style="display: none;">
+              <div class="portfolio-card">
+                <h4><img src="D:\University Web Work\Final term syllabus\UOL Exam Management System\img\hassan.jpg" style="width: 50px; height: 50px; border-radius: 50%;" alt="" srcset=""> Developer Information</h4>
+                <div class="developer-details">
+                  <p><strong>Name:</strong> M Hassan Asghar</p>
+                  <p><strong>Role:</strong> Full Stack Developer</p>
+                  <p><strong>Specialization:</strong> Computer Science</p>
+                  <p><strong>Phone:</strong> <a href="tel:+923407542382">0340-7542382</a></p>
+                  <p><strong>Email:</strong> <a href="mailto:hj0889297@gmail.com">hj0889297@gmail.com</a></p>
+                </div>
+                <div class="portfolio-actions">
+                  <button class="primary-btn" onclick="copyContactInfo()">
+                    <i class="fas fa-copy"></i> Copy Contact Info
+                  </button>
+                  <button class="secondary-btn" onclick="hidePortfolioInfo()">
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <!-- Toast Notifications -->
+  <div id="toastContainer" class="toast-container">
+    <!-- Toasts will be injected here -->
+  </div>
+
+  <!-- Modal for Exam Details -->
+  <div id="examModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalTitle">Exam Details</h3>
+        <button class="modal-close" onclick="closeModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Modal content will be injected here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
